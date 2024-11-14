@@ -2,7 +2,7 @@
 
 #include "VaRestLibrary.h"
 
-#include "VaRest.h"
+#include "VaRestX.h"
 #include "VaRestDefines.h"
 #include "VaRestRequestJSON.h"
 

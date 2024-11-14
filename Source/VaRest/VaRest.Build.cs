@@ -14,7 +14,7 @@ namespace UnrealBuildTool.Rules
 
 			PrivateIncludePaths.AddRange(
 				new string[] {
-					"VaRest/Private",
+					"VaRestX/Private",
 					// ... add other private include paths required here ...
 				});
 

@@ -1,0 +1,25 @@
+{
+	"FileVersion": 3,
+	"FriendlyName": "VaRestX",
+	"Version": 32,
+	"VersionName": "1.1-r35",
+	"CreatedBy": "Vladimir Alyamkin, Mauro Leoci",
+	"CreatedByURL": "https://ufna.dev",
+	"EngineVersion": "5.4.0",
+	"Description": "Plugin that makes REST (JSON) / HTTP Request server communication exposed to blueprint and easy to use",
+	"Category": "Network",
+	"DocsURL": "https://bit.ly/VaRest-Docs",
+	"SupportURL": "https://github.com/AboveConstraints/VaRestX",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/e47be161e7a24e928560290abd5dcc4f",
+	"Modules": [
+		{
+			"Name": "VaRest",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		},
+		{
+			"Name": "VaRestEditor",
+			"Type": "UncookedOnly"
+		}
+	]
+}

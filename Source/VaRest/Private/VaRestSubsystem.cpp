@@ -21,7 +21,7 @@ void UVaRestSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
 
-	UE_LOG(LogVaRest, Log, TEXT("%s: VaRest subsystem initialized"), *VA_FUNC_LINE);
+	UE_LOG(LogVaRest, Log, TEXT("%s: VaRestX subsystem initialized"), *VA_FUNC_LINE);
 }
 
 void UVaRestSubsystem::Deinitialize()

@@ -1,6 +1,6 @@
 // Copyright 2014-2019 Vladimir Alyamkin. All Rights Reserved.
 
-#include "VaRest.h"
+#include "VaRestX.h"
 
 #include "VaRestDefines.h"
 #include "VaRestLibrary.h"
@@ -19,20 +19,20 @@ void FVaRestModule::StartupModule()
 	// Register settings
 	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
-		SettingsModule->RegisterSettings("Project", "Plugins", "VaRest",
-			LOCTEXT("RuntimeSettingsName", "VaRest"),
-			LOCTEXT("RuntimeSettingsDescription", "Configure VaRest plugin settings"),
+		SettingsModule->RegisterSettings("Project", "Plugins", "VaRestX",
+			LOCTEXT("RuntimeSettingsName", "VaRestX"),
+			LOCTEXT("RuntimeSettingsDescription", "Configure VaRestX plugin settings"),
 			ModuleSettings);
 	}
 
-	UE_LOG(LogVaRest, Log, TEXT("%s: VaRest (%s) module started"), *VA_FUNC_LINE, *UVaRestLibrary::GetVaRestVersion());
+	UE_LOG(LogVaRest, Log, TEXT("%s: VaRestX (%s) module started"), *VA_FUNC_LINE, *UVaRestLibrary::GetVaRestVersion());
 }
 
 void FVaRestModule::ShutdownModule()
 {
 	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
-		SettingsModule->UnregisterSettings("Project", "Plugins", "VaRest");
+		SettingsModule->UnregisterSettings("Project", "Plugins", "VaRestX");
 	}
 
 	if (!GExitPurge)
