@@ -2,13 +2,12 @@
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/ufna/VaRest?include_prereleases)
 
 > [!IMPORTANT]
-> Hi there. Thank you for your interest and support over the years! I want to inform you that I will be archiving the VaRest project. While this means I will no longer be actively maintaining it, I encourage anyone interested to fork the repository and continue development if you wish.
+> This is a fork of the original VaRest from ufna which we loved and used widely in our projects, unfortuntaly the support has come to an end, and projects still use it over the http blueprint plugin provided by epic, which could be less advanced and curated than this, we have decided to fork this project and bring it back for Unreal Engine 5.5, however we ask the help of the entire community to keep it up to date and improve it with pull requests as we don't assure you any improvements or new features.
 >
-> Feel free to use the existing code as a foundation for your own projects. I appreciate the contributions and enthusiasm of this community, and I hope VaRest continues to be a valuable resource for you.
+> Feel free to use the existing code as a foundation for your own projects.
+# VaRestX
 
-# VaRest
-
-VaRest is the plugin for [Unreal Engine 4](https://www.unrealengine.com/) that makes REST server communications easier to use.
+VaRestX is the plugin for [Unreal Engine 5](https://www.unrealengine.com/) that makes REST server communications easier to use.
 
 Key features:
 
@@ -19,8 +18,6 @@ Key features:
 * Both bindable events and **latent functions** are provided to control the asynchronous requests
 
 Check the [Wiki](http://bit.ly/VaRest-Docs) for plugin usage examples and installation notes.
-
-Current version: **1.1 R 33** (UE 5.2)
 
 ![SCREENSHOT](SCREENSHOT.jpg)
 
