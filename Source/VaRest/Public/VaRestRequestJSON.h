@@ -293,18 +293,17 @@ public:
 	int32 ResponseSize;
 
 	/** DEPRECATED: Please use GetResponseContentAsString() instead */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRest|Response")
-	FString ResponseContent;
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRest|Response")
+	// FString ResponseContent;
 
 	/** Is the response valid JSON? */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRest|Response")
 	bool bIsValidJsonResponse;
 
 protected:
-	/** Default value for deprecated ResponseContent variable */
-	static FString DeprecatedResponseString;
+	/** Response json content */
+	FString ResponseContent;
 
-protected:
 	/** Latent action helper */
 	FVaRestLatentAction<UVaRestJsonObject*>* ContinueAction;
 
@@ -322,6 +321,7 @@ protected:
 	/** Used for special cases when used wants to have plain string data in request.
 	 * Attn.! Content-type x-www-form-urlencoded only. */
 	FString StringRequestContent;
+
 
 	/** Response data stored as JSON */
 	UPROPERTY()

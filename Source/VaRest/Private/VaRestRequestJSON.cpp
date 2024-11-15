@@ -15,8 +15,6 @@
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
 
-FString UVaRestRequestJSON::DeprecatedResponseString(TEXT("DEPRECATED: Please use GetResponseContentAsString() instead"));
-
 template <class T>
 void FVaRestLatentAction<T>::Cancel()
 {
@@ -127,8 +125,8 @@ void UVaRestRequestJSON::ResetResponseData()
 
 	bIsValidJsonResponse = false;
 
-	// #127 Reset string to deprecated state
-	ResponseContent = DeprecatedResponseString;
+	// #127 Reset response content
+	ResponseContent = TEXT("{}");
 
 	ResponseBytes.Empty();
 	ResponseContentLength = 0;
@@ -619,7 +617,7 @@ FString UVaRestRequestJSON::GetResponseContentAsString(bool bCacheResponseConten
 	if (!ResponseJsonObj || !ResponseJsonObj->IsValidLowLevel())
 	{
 		// Discard previous cached string if we had one
-		ResponseContent = DeprecatedResponseString;
+		ResponseContent = TEXT("{}");;
 
 		return TEXT("Invalid response");
 	}
@@ -632,7 +630,7 @@ FString UVaRestRequestJSON::GetResponseContentAsString(bool bCacheResponseConten
 	}
 
 	// Check that we haven't cached content yet
-	if (ResponseContent == DeprecatedResponseString)
+	if (ResponseContent == TEXT("{}"))
 	{
 		UE_LOG(LogVaRest, Warning, TEXT("%s: Response content string is cached"), *VA_FUNC_LINE);
 		ResponseContent = ResponseJsonObj->EncodeJson();
