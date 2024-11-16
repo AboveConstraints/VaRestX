@@ -1,3 +1,5 @@
 /Intermediate/
 /Binaries/
 .DS_Store
+.vscode
+.vs
