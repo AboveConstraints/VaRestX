@@ -30,7 +30,7 @@
 		{
 			"Name": "VaRestEditor",
 			"Type": "UncookedOnly",
-				"PlatformAllowList": [
+			"PlatformAllowList": [
 				"LinuxArm64",
 				"Mac",
 				"TVOS",
