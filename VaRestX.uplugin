@@ -10,36 +10,20 @@
 	"Category": "Network",
 	"DocsURL": "https://bit.ly/VaRest-Docs",
 	"SupportURL": "https://github.com/AboveConstraints/VaRestX",
-	"FabURL": "com.epicgames.launcher://ue/Fab/product/910bf08c-c414-4f3a-8b0c-588ee098a443"
+	"FabURL": "com.epicgames.launcher://ue/Fab/product/910bf08c-c414-4f3a-8b0c-588ee098a443",
 	"Modules": [
 		{
 			"Name": "VaRest",
 			"Type": "Runtime",
 			"LoadingPhase": "PreDefault",
-			"PlatformAllowList": [
-				"LinuxArm64",
-				"Mac",
-				"TVOS",
-				"VisionOS",
-				"Windows",
-				"Android",
-				"IOS",
-				"Linux"
-			]
+			"PlatformAllowList": ["Win64", "Mac", "Linux", "TVOS", "IOS", "Android", "LinuxArm64", "VisionOS"],
+			"PlatformDenyList": []
 		},
 		{
 			"Name": "VaRestEditor",
 			"Type": "UncookedOnly",
-				"PlatformAllowList": [
-				"LinuxArm64",
-				"Mac",
-				"TVOS",
-				"VisionOS",
-				"Windows",
-				"Android",
-				"IOS",
-				"Linux"
-			]
+			"PlatformAllowList": ["Win64", "Mac", "Linux", "TVOS", "IOS", "Android", "LinuxArm64", "VisionOS"],
+			"PlatformDenyList": []
 		}
 	]
 }
