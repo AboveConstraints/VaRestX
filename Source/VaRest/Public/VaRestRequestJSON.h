@@ -92,101 +92,101 @@ public:
 	// Construction
 
 	/** Set verb to the request */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	void SetVerb(EVaRestRequestVerb Verb);
 
 	/** Set custom verb to the request */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	void SetCustomVerb(FString Verb);
 
 	/** Set content type to the request. If you're using the x-www-form-urlencoded,
 	 * params/constaints should be defined as key=ValueString pairs from Json data */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	void SetContentType(EVaRestRequestContentType ContentType);
 
 	/** Set content type of the request for binary post data */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	void SetBinaryContentType(const FString& ContentType);
 
 	/** Set content of the request for binary post data */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	void SetBinaryRequestContent(const TArray<uint8>& Content);
 
 	/** Set content of the request as a plain string */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	void SetStringRequestContent(const FString& Content);
 
 	/** Sets optional header info */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	void SetHeader(const FString& HeaderName, const FString& HeaderValue);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Destruction and reset
 
 	/** Reset all internal saved data */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Utility")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Utility")
 	void ResetData();
 
 	/** Reset saved request data */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	void ResetRequestData();
 
 	/** Reset saved response data */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Response")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Response")
 	void ResetResponseData();
 
 	/** Cancel latent response waiting  */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Response")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Response")
 	void Cancel();
 
 	//////////////////////////////////////////////////////////////////////////
 	// JSON data accessors
 
 	/** Get the Request Json object */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	UVaRestJsonObject* GetRequestObject() const;
 
 	/** Set the Request Json object */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	void SetRequestObject(UVaRestJsonObject* JsonObject);
 
 	/** Get the Response Json object */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Response")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Response")
 	UVaRestJsonObject* GetResponseObject() const;
 
 	/** Set the Response Json object */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Response")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Response")
 	void SetResponseObject(UVaRestJsonObject* JsonObject);
 
 	/** Get the Response Json value */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Response")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Response")
 	UVaRestJsonValue* GetResponseValue() const;
 
 	///////////////////////////////////////////////////////////////////////////
 	// Request/response data access
 
 	/** Get url of http request */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Request")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Request")
 	FString GetURL() const;
 
 	/** Get verb to the request */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Request")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Request")
 	EVaRestRequestVerb GetVerb() const;
 
 	/** Get status of http request */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Request")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Request")
 	EVaRestRequestStatus GetStatus() const;
 
 	/** Get the response code of the last query */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Response")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Response")
 	int32 GetResponseCode() const;
 
 	/** Get value of desired response header */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Response")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Response")
 	FString GetResponseHeader(const FString& HeaderName);
 
 	/** Get list of all response headers */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Response")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Response")
 	TArray<FString> GetAllResponseHeaders() const;
 
 	/**
@@ -195,7 +195,7 @@ public:
 	 *
 	 * @return the content length (if available)
 	 */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Response")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Response")
 	int32 GetResponseContentLength() const;
 
 	/**
@@ -203,7 +203,7 @@ public:
 	 *
 	 * @param Content - array that will be filled with the content.
 	 */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Response")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Response")
 	const TArray<uint8>& GetResponseContent() const;
 
 	//////////////////////////////////////////////////////////////////////////
@@ -211,19 +211,19 @@ public:
 
 public:
 	/** Setting request URL */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
-	void SetURL(const FString& Url = TEXT("http://alyamkin.com"));
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
+	void SetURL(const FString& Url = TEXT("https://xcibe95x.com/VaRestX.json"));
 
 	/** Open URL with current setup */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
-	virtual void ProcessURL(const FString& Url = TEXT("http://alyamkin.com"));
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
+	virtual void ProcessURL(const FString& Url = TEXT("https://xcibe95x.com/VaRestX.json"));
 
 	/** Open URL in latent mode */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request", meta = (Latent, LatentInfo = "LatentInfo", HidePin = "WorldContextObject", DefaultToSelf = "WorldContextObject"))
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request", meta = (Latent, LatentInfo = "LatentInfo", HidePin = "WorldContextObject", DefaultToSelf = "WorldContextObject"))
 	virtual void ApplyURL(const FString& Url, UVaRestJsonObject*& Result, UObject* WorldContextObject, struct FLatentActionInfo LatentInfo);
 
 	/** Check URL and execute process request */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Request")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	virtual void ExecuteProcessRequest();
 
 protected:
@@ -239,11 +239,11 @@ private:
 
 public:
 	/** Event occured when the request has been completed */
-	UPROPERTY(BlueprintAssignable, Category = "VaRest|Event")
+	UPROPERTY(BlueprintAssignable, Category = "VaRestX|Event")
 	FOnRequestComplete OnRequestComplete;
 
 	/** Event occured when the request wasn't successfull */
-	UPROPERTY(BlueprintAssignable, Category = "VaRest|Event")
+	UPROPERTY(BlueprintAssignable, Category = "VaRestX|Event")
 	FOnRequestFail OnRequestFail;
 
 	/** Event occured when the request has been completed */
@@ -257,7 +257,7 @@ public:
 
 public:
 	/** Add tag to this request */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Utility")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Utility")
 	void AddTag(FName Tag);
 
 	/**
@@ -265,11 +265,11 @@ public:
 	 *
 	 * @return Number of removed elements
 	 */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Utility")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Utility")
 	int32 RemoveTag(FName Tag);
 
 	/** See if this request contains the supplied tag */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Utility")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Utility")
 	bool HasTag(FName Tag) const;
 
 protected:
@@ -284,20 +284,20 @@ public:
 	 * Get request response stored as a string
 	 * @param bCacheResponseContent - Set true if you plan to use it few times to prevent deserialization each time
 	 */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Response")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Response")
 	FString GetResponseContentAsString(bool bCacheResponseContent = true);
 
 public:
 	/** Response size */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRest|Response")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRestX|Response")
 	int32 ResponseSize;
 
 	/** DEPRECATED: Please use GetResponseContentAsString() instead */
-	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRest|Response")
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRestX|Response")
 	// FString ResponseContent;
 
 	/** Is the response valid JSON? */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRest|Response")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRestX|Response")
 	bool bIsValidJsonResponse;
 
 protected:
