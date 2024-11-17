@@ -1,4 +1,4 @@
-// Copyright 2014-2019 Vladimir Alyamkin. All Rights Reserved.
+// Copyright 2025 Vladimir Alyamkin, Mauro Leoci. All Rights Reserved.
 
 #include "VaRestX.h"
 
@@ -6,7 +6,7 @@
 #include "VaRestLibrary.h"
 #include "VaRestSettings.h"
 
-#include "Developer/Settings/Public/ISettingsModule.h"
+#include "ISettingsModule.h"
 #include "UObject/Package.h"
 
 #define LOCTEXT_NAMESPACE "FVaRestModule"
@@ -23,6 +23,10 @@ void FVaRestModule::StartupModule()
 			LOCTEXT("RuntimeSettingsName", "VaRestX"),
 			LOCTEXT("RuntimeSettingsDescription", "Configure VaRestX plugin settings"),
 			ModuleSettings);
+	}
+	else
+	{
+		UE_LOG(LogVaRest, Warning, TEXT("Settings module is unavailable. Skipping settings registration."));
 	}
 
 	UE_LOG(LogVaRest, Log, TEXT("%s: VaRestX (%s) module started"), *VA_FUNC_LINE, *UVaRestLibrary::GetVaRestVersion());

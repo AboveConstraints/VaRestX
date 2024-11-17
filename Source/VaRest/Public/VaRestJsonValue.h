@@ -32,7 +32,7 @@ class VAREST_API UVaRestJsonValue : public UObject
 
 public:
 	/** Reset all internal data */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Json")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Json")
 	void Reset();
 
 	/** Get the root Json value */
@@ -45,44 +45,44 @@ public:
 	// FJsonValue API
 
 	/** Get type of Json value (Enum) */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Json")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Json")
 	EVaJson GetType() const;
 
 	/** Get type of Json value (String) */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Json")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Json")
 	FString GetTypeString() const;
 
 	/** Returns true if this value is a 'null' */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Json")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Json")
 	bool IsNull() const;
 
 	/** Returns this value as a double, throwing an error if this is not an Json Number
 	 * Attn.!! float used instead of double to make the function blueprintable! */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Json")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Json")
 	float AsNumber() const;
 
 	/** Returns this value as a int32, throwing an error if this is not an Json Number */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Json")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Json")
 	int32 AsInt32() const;
 
 	/** Returns this value as a int64, throwing an error if this is not an Json Number */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Json")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Json")
 	int64 AsInt64() const;
 
 	/** Returns this value as a string, throwing an error if this is not an Json String */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Json")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Json")
 	FString AsString() const;
 
 	/** Returns this value as a boolean, throwing an error if this is not an Json Bool */
-	UFUNCTION(BlueprintPure, Category = "VaRest|Json")
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Json")
 	bool AsBool() const;
 
 	/** Returns this value as an array, throwing an error if this is not an Json Array */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Json")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Json")
 	TArray<UVaRestJsonValue*> AsArray() const;
 
 	/** Returns this value as an object, throwing an error if this is not an Json Object */
-	UFUNCTION(BlueprintCallable, Category = "VaRest|Json")
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Json")
 	UVaRestJsonObject* AsObject();
 
 	//////////////////////////////////////////////////////////////////////////
