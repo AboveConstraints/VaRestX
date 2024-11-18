@@ -6,7 +6,7 @@
 #include "VaRestLibrary.h"
 #include "VaRestSettings.h"
 
-#include "ISettingsModule.h"
+#include "Developer/Settings/Public/ISettingsModule.h"
 #include "UObject/Package.h"
 
 #define LOCTEXT_NAMESPACE "FVaRestModule"
