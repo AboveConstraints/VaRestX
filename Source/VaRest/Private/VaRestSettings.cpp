@@ -1,4 +1,4 @@
-// Copyright 2014-2019 Vladimir Alyamkin. All Rights Reserved.
+// Copyright 2024/2025 Vladimir Alyamkin, Mauro Leoci. All Rights Reserved.
 
 #include "VaRestSettings.h"
 
