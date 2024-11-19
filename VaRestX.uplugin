@@ -8,7 +8,7 @@
 	"EngineVersion": "5.4.0",
 	"Description": "Plugin that makes REST (JSON) / HTTP Request server communication exposed to blueprint and easy to use",
 	"Category": "Network",
-	"DocsURL": "https://bit.ly/VaRest-Docs",
+	"DocsURL": "https://ufna.notion.site/VaRest-UE4-Plugin-40b98c54fc184033b60a42e0e4753536",
 	"SupportURL": "https://github.com/AboveConstraints/VaRestX",
 	"FabURL": "com.epicgames.launcher://ue/Fab/product/910bf08c-c414-4f3a-8b0c-588ee098a443",
 	"Modules": [
