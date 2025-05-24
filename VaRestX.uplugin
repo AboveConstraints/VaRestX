@@ -1,14 +1,14 @@
 {
 	"FileVersion": 3,
 	"FriendlyName": "VaRestX",
-	"Version": 32,
-	"VersionName": "1.1-r36",
+	"Version": 33,
+	"VersionName": "1.1-r37",
 	"CreatedBy": "Vladimir Alyamkin, Mauro Leoci",
 	"CreatedByURL": "https://ufna.dev",
-	"EngineVersion": "5.5.0",
+	"EngineVersion": "5.6.0",
 	"Description": "Plugin that makes REST (JSON) / HTTP Request server communication exposed to blueprint and easy to use",
 	"Category": "Network",
-	"DocsURL": "https://ufna.notion.site/VaRest-UE4-Plugin-40b98c54fc184033b60a42e0e4753536",
+	"DocsURL": "https://cibe.notion.site/VaRestX-Plugin-1448de17957180aca6abdf3e905315d2?pvs=4",
 	"SupportURL": "https://github.com/AboveConstraints/VaRestX",
 	"FabURL": "com.epicgames.launcher://ue/Fab/product/910bf08c-c414-4f3a-8b0c-588ee098a443",
 	"Modules": [
