@@ -1,4 +1,4 @@
-// Copyright 2015-2019 Mail.Ru Group. All Rights Reserved.
+// Copyright 2024/2025 Vladimir Alyamkin, Mauro Leoci. All Rights Reserved.
 
 #pragma once
 
