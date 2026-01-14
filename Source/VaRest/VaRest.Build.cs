@@ -12,11 +12,11 @@ namespace UnrealBuildTool.Rules
 			PrecompileForTargets = PrecompileTargetsType.Any;
 			DefaultBuildSettings = BuildSettingsVersion.V5;
 
-			PrivateIncludePaths.AddRange(
-				new string[] {
-					"VaRestX/Private",
-					// ... add other private include paths required here ...
-				});
+                        var VaRestXPrivatePath = Path.Combine(ModuleDirectory, "..", "VaRestX", "Private");
+                        if (Directory.Exists(VaRestXPrivatePath))
+                        {
+                                PrivateIncludePaths.Add("VaRestX/Private");
+                        }
 
 			PublicDependencyModuleNames.AddRange(
 				new string[]
