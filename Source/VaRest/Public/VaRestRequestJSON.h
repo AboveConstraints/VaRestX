@@ -127,9 +127,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "VaRestX|Utility")
 	void ResetData();
 
-	/** Reset saved request data */
+	/** Reset saved request data. Set bClearHeaders to also drop any headers set via SetHeader (off by default for backward compatibility). */
 	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
-	void ResetRequestData();
+	void ResetRequestData(bool bClearHeaders = false);
 
 	/** Reset saved response data */
 	UFUNCTION(BlueprintCallable, Category = "VaRestX|Response")
@@ -299,6 +299,9 @@ public:
 protected:
 	/** Response json content */
 	FString ResponseContent;
+
+	/** Tracks whether ResponseContent already holds the encoded JSON for the current response. */
+	bool bResponseContentCached;
 
 	/** Latent action helper */
 	FVaRestLatentAction<UVaRestJsonObject*>* ContinueAction;

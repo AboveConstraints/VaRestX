@@ -81,7 +81,7 @@ void UVaRestRequestJSON::ResetData()
 	ResetResponseData();
 }
 
-void UVaRestRequestJSON::ResetRequestData()
+void UVaRestRequestJSON::ResetRequestData(bool bClearHeaders)
 {
 	if (RequestJsonObj != nullptr)
 	{
@@ -94,6 +94,11 @@ void UVaRestRequestJSON::ResetRequestData()
 
 	RequestBytes.Empty();
 	StringRequestContent.Empty();
+
+	if (bClearHeaders)
+	{
+		RequestHeaders.Empty();
+	}
 }
 
 void UVaRestRequestJSON::ResetResponseData()
@@ -124,6 +129,7 @@ void UVaRestRequestJSON::ResetResponseData()
 
 	// #127 Reset response content
 	ResponseContent = TEXT("{}");
+	bResponseContentCached = false;
 
 	ResponseBytes.Empty();
 	ResponseContentLength = 0;
@@ -614,7 +620,8 @@ FString UVaRestRequestJSON::GetResponseContentAsString(bool bCacheResponseConten
 	if (!ResponseJsonObj || !ResponseJsonObj->IsValidLowLevel())
 	{
 		// Discard previous cached string if we had one
-		ResponseContent = TEXT("{}");;
+		ResponseContent = TEXT("{}");
+		bResponseContentCached = false;
 
 		return TEXT("Invalid response");
 	}
@@ -627,10 +634,11 @@ FString UVaRestRequestJSON::GetResponseContentAsString(bool bCacheResponseConten
 	}
 
 	// Check that we haven't cached content yet
-	if (ResponseContent == TEXT("{}"))
+	if (!bResponseContentCached)
 	{
 		UE_LOG(LogVaRest, Verbose, TEXT("%s: Response content string is cached"), *VA_FUNC_LINE);
 		ResponseContent = ResponseJsonObj->EncodeJson();
+		bResponseContentCached = true;
 	}
 
 	// Return previously cached content now

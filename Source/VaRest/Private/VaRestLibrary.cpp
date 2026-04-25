@@ -23,11 +23,8 @@ FString UVaRestLibrary::PercentEncode(const FString& Source)
 
 FString UVaRestLibrary::Base64Encode(const FString& Source)
 {
-	TArray<uint8> ByteArray;
-	const FTCHARToUTF8 StringSrc = FTCHARToUTF8(Source.GetCharArray().GetData());
-	ByteArray.Append((uint8*)StringSrc.Get(), StringSrc.Length());
-
-	return FBase64::Encode(ByteArray);
+	const FTCHARToUTF8 Utf8(*Source);
+	return FBase64::Encode(reinterpret_cast<const uint8*>(Utf8.Get()), Utf8.Length());
 }
 
 bool UVaRestLibrary::Base64Decode(const FString& Source, FString& Dest)
