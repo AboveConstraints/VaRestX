@@ -6,6 +6,7 @@
 #include "VaRestJsonObject.h"
 #include "VaRestJsonValue.h"
 #include "VaRestLibrary.h"
+#include "VaRestSSEArchive.h"
 #include "VaRestSettings.h"
 
 #include "Engine/Engine.h"
@@ -121,6 +122,20 @@ void UVaRestRequestJSON::AddMultipartFileField(const FString& FieldName, const F
 	MultipartParts.Add(MoveTemp(Part));
 }
 
+void UVaRestRequestJSON::SetStreamResponse(bool bEnabled)
+{
+	bStreamResponse = bEnabled;
+}
+
+void UVaRestRequestJSON::BroadcastStreamEvent(const FString& EventType, const FString& Data, const FString& Id)
+{
+	OnStreamEvent.Broadcast(this, EventType, Data, Id);
+	if (!Data.IsEmpty())
+	{
+		OnStreamChunk.Broadcast(this, Data);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Destruction and reset
 
@@ -195,6 +210,8 @@ void UVaRestRequestJSON::Cancel()
 	}
 
 	InflightRequests.RemoveAllSwap([this](const TWeakObjectPtr<UVaRestRequestJSON>& Ptr) { return !Ptr.IsValid() || Ptr.Get() == this; });
+
+	StreamArchive.Reset();
 
 	ResetResponseData();
 }
@@ -584,6 +601,23 @@ void UVaRestRequestJSON::ProcessRequest()
 		HttpRequest->SetHeader(It.Key(), It.Value());
 	}
 
+	// SSE streaming setup: install a body-receive archive that parses events as bytes arrive,
+	// and add the conventional Accept/Cache-Control headers if the user didn't override them.
+	if (bStreamResponse)
+	{
+		if (!RequestHeaders.Contains(TEXT("Accept")))
+		{
+			HttpRequest->SetHeader(TEXT("Accept"), TEXT("text/event-stream"));
+		}
+		if (!RequestHeaders.Contains(TEXT("Cache-Control")))
+		{
+			HttpRequest->SetHeader(TEXT("Cache-Control"), TEXT("no-cache"));
+		}
+
+		StreamArchive = MakeShared<FVaRestSSEArchive, ESPMode::ThreadSafe>(this);
+		HttpRequest->SetResponseBodyReceiveStream(StreamArchive.ToSharedRef());
+	}
+
 	// Bind event
 	HttpRequest->OnProcessRequestComplete().BindUObject(this, &UVaRestRequestJSON::OnProcessRequestComplete);
 	HttpRequest->OnRequestProgress64().BindUObject(this, &UVaRestRequestJSON::OnHttpRequestProgress);
@@ -610,6 +644,10 @@ void UVaRestRequestJSON::OnProcessRequestComplete(FHttpRequestPtr Request, FHttp
 
 	// Drop from inflight registry
 	InflightRequests.RemoveAllSwap([this](const TWeakObjectPtr<UVaRestRequestJSON>& Ptr) { return !Ptr.IsValid() || Ptr.Get() == this; });
+
+	// Release the SSE parser (if any). Worker thread is done emitting by now.
+	const bool bWasStreaming = StreamArchive.IsValid();
+	StreamArchive.Reset();
 
 	// Be sure that we have no data from previous response
 	ResetResponseData();
@@ -649,7 +687,12 @@ void UVaRestRequestJSON::OnProcessRequestComplete(FHttpRequestPtr Request, FHttp
 		}
 	}
 
-	if (UVaRestLibrary::GetVaRestSettings()->bUseChunkedParser)
+	if (bWasStreaming)
+	{
+		// Streamed body was consumed by the SSE parser — nothing to deserialize.
+		ResponseSize = 0;
+	}
+	else if (UVaRestLibrary::GetVaRestSettings()->bUseChunkedParser)
 	{
 		// Try to deserialize data to JSON
 		const TArray<uint8>& Bytes = Response->GetContent();

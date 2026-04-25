@@ -15,6 +15,7 @@
 class UVaRestJsonValue;
 class UVaRestJsonObject;
 class UVaRestSettings;
+class FVaRestSSEArchive;
 
 /**
  * @author Original latent action class by https://github.com/unktomi
@@ -76,6 +77,8 @@ public:
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRequestComplete, class UVaRestRequestJSON*, Request);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRequestFail, class UVaRestRequestJSON*, Request);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnRequestProgress, class UVaRestRequestJSON*, Request, int64, BytesSent, int64, BytesReceived);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnStreamEvent, class UVaRestRequestJSON*, Request, FString, EventType, FString, Data, FString, Id);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStreamChunk, class UVaRestRequestJSON*, Request, FString, Data);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnStaticRequestComplete, class UVaRestRequestJSON*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnStaticRequestFail, class UVaRestRequestJSON*);
@@ -140,6 +143,13 @@ public:
 	/** Add a file field for a multipart/form-data request. Only used when content type is multipart_form_data. */
 	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	void AddMultipartFileField(const FString& FieldName, const FString& FileName, const TArray<uint8>& FileData, const FString& ContentType);
+
+	/** Enable Server-Sent Events streaming for this request. Must be called before ProcessRequest. */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
+	void SetStreamResponse(bool bEnabled);
+
+	/** Internal: forwards a parsed SSE event to BP delegates on the game thread. */
+	void BroadcastStreamEvent(const FString& EventType, const FString& Data, const FString& Id);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Destruction and reset
@@ -278,6 +288,14 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "VaRestX|Event")
 	FOnRequestProgress OnRequestProgress;
 
+	/** Fires on the game thread for each parsed SSE event when stream mode is enabled. */
+	UPROPERTY(BlueprintAssignable, Category = "VaRestX|Event")
+	FOnStreamEvent OnStreamEvent;
+
+	/** Convenience: fires on the game thread for every SSE 'data:' payload regardless of event type. */
+	UPROPERTY(BlueprintAssignable, Category = "VaRestX|Event")
+	FOnStreamChunk OnStreamChunk;
+
 	/** Event occured when the request has been completed */
 	FOnStaticRequestComplete OnStaticRequestComplete;
 
@@ -355,6 +373,12 @@ protected:
 
 	TArray<uint8> RequestBytes;
 	FString BinaryContentType;
+
+	/** True when SSE streaming is enabled via SetStreamResponse. */
+	bool bStreamResponse = false;
+
+	/** Active SSE parser archive for the current request, null otherwise. */
+	TSharedPtr<FVaRestSSEArchive, ESPMode::ThreadSafe> StreamArchive;
 
 	/** Internal representation of a multipart/form-data part. */
 	struct FMultipartPart
