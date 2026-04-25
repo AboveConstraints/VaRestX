@@ -367,7 +367,7 @@ void UVaRestRequestJSON::ProcessRequest()
 		}
 		else
 		{
-			UE_LOG(LogVaRest, Log, TEXT("%s: Request (urlencoded): %s %s (check bExtendedLog for additional data)"), *VA_FUNC_LINE, *HttpRequest->GetVerb(), *HttpRequest->GetURL());
+			UE_LOG(LogVaRest, Log, TEXT("%s: Request (urlencoded): %s %s (enable Project Settings -> Plugins -> VaRestX -> Extended Log to see body)"), *VA_FUNC_LINE, *HttpRequest->GetVerb(), *HttpRequest->GetURL());
 		}
 
 		break;
@@ -412,7 +412,7 @@ void UVaRestRequestJSON::ProcessRequest()
 		}
 		else
 		{
-			UE_LOG(LogVaRest, Log, TEXT("%s: Request (url body): %s %s (check bExtendedLog for additional data)"), *VA_FUNC_LINE, *HttpRequest->GetVerb(), *HttpRequest->GetURL());
+			UE_LOG(LogVaRest, Log, TEXT("%s: Request (url body): %s %s (enable Project Settings -> Plugins -> VaRestX -> Extended Log to see body)"), *VA_FUNC_LINE, *HttpRequest->GetVerb(), *HttpRequest->GetURL());
 		}
 
 		break;
@@ -450,7 +450,7 @@ void UVaRestRequestJSON::ProcessRequest()
 		}
 		else
 		{
-			UE_LOG(LogVaRest, Log, TEXT("Request (json): %s %s (check bExtendedLog for additional data)"), *HttpRequest->GetVerb(), *HttpRequest->GetURL());
+			UE_LOG(LogVaRest, Log, TEXT("Request (json): %s %s (enable Project Settings -> Plugins -> VaRestX -> Extended Log to see body)"), *HttpRequest->GetVerb(), *HttpRequest->GetURL());
 		}
 
 		break;
@@ -622,14 +622,14 @@ FString UVaRestRequestJSON::GetResponseContentAsString(bool bCacheResponseConten
 	// Check if we should re-genetate it in runtime
 	if (!bCacheResponseContent)
 	{
-		UE_LOG(LogVaRest, Warning, TEXT("%s: Use of uncashed getter could be slow"), *VA_FUNC_LINE);
+		UE_LOG(LogVaRest, Verbose, TEXT("%s: Use of uncached getter could be slow"), *VA_FUNC_LINE);
 		return ResponseJsonObj->EncodeJson();
 	}
 
 	// Check that we haven't cached content yet
 	if (ResponseContent == TEXT("{}"))
 	{
-		UE_LOG(LogVaRest, Warning, TEXT("%s: Response content string is cached"), *VA_FUNC_LINE);
+		UE_LOG(LogVaRest, Verbose, TEXT("%s: Response content string is cached"), *VA_FUNC_LINE);
 		ResponseContent = ResponseJsonObj->EncodeJson();
 	}
 

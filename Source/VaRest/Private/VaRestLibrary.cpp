@@ -68,7 +68,8 @@ FString UVaRestLibrary::StringToSha1(const FString& StringToHash)
 {
 	FSHA1 Sha1Gen;
 
-	Sha1Gen.Update((unsigned char*)TCHAR_TO_ANSI(*StringToHash), FCString::Strlen(*StringToHash));
+	const FTCHARToUTF8 Utf8(*StringToHash);
+	Sha1Gen.Update((const uint8*)Utf8.Get(), Utf8.Length());
 	Sha1Gen.Final();
 
 	FString Sha1String;
