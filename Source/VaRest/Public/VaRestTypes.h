@@ -26,7 +26,8 @@ enum class EVaRestRequestContentType : uint8
 	x_www_form_urlencoded_url	UMETA(DisplayName = "x-www-form-urlencoded (URL)"),
 	x_www_form_urlencoded_body	UMETA(DisplayName = "x-www-form-urlencoded (Request Body)"),
 	json,
-	binary
+	binary,
+	multipart_form_data			UMETA(DisplayName = "multipart/form-data")
 };
 // clang-format on
 

@@ -177,6 +177,54 @@ UVaRestJsonValue* UVaRestJsonObject::GetField(const FString& FieldName) const
 	return nullptr;
 }
 
+UVaRestJsonValue* UVaRestJsonObject::GetFieldByPath(const FString& Path) const
+{
+	if (Path.IsEmpty())
+	{
+		return nullptr;
+	}
+
+	TArray<FString> Segments;
+	Path.ParseIntoArray(Segments, TEXT("."), true);
+	if (Segments.Num() == 0)
+	{
+		return nullptr;
+	}
+
+	TSharedPtr<FJsonObject> Current = JsonObj;
+	for (int32 Index = 0; Index < Segments.Num(); ++Index)
+	{
+		if (!Current.IsValid())
+		{
+			return nullptr;
+		}
+
+		const FString& Segment = Segments[Index];
+		TSharedPtr<FJsonValue> Value = Current->TryGetField(Segment);
+		if (!Value.IsValid())
+		{
+			return nullptr;
+		}
+
+		const bool bIsLast = (Index == Segments.Num() - 1);
+		if (bIsLast)
+		{
+			UVaRestJsonValue* Result = NewObject<UVaRestJsonValue>();
+			Result->SetRootValue(Value);
+			return Result;
+		}
+
+		const TSharedPtr<FJsonObject>* AsObject = nullptr;
+		if (!Value->TryGetObject(AsObject) || AsObject == nullptr)
+		{
+			return nullptr;
+		}
+		Current = *AsObject;
+	}
+
+	return nullptr;
+}
+
 void UVaRestJsonObject::SetField(const FString& FieldName, UVaRestJsonValue* JsonValue)
 {
 	if (FieldName.IsEmpty())

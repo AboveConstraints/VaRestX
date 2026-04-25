@@ -11,9 +11,14 @@
 #include "Engine/Engine.h"
 #include "Engine/LatentActionManager.h"
 #include "Engine/World.h"
+#include "HAL/FileManager.h"
 #include "Interfaces/IHttpResponse.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Guid.h"
 #include "Serialization/JsonSerializer.h"
 #include "Serialization/JsonWriter.h"
+
+TArray<TWeakObjectPtr<UVaRestRequestJSON>> UVaRestRequestJSON::InflightRequests;
 
 template <class T>
 void FVaRestLatentAction<T>::Cancel()
@@ -72,6 +77,50 @@ void UVaRestRequestJSON::SetHeader(const FString& HeaderName, const FString& Hea
 	RequestHeaders.Add(HeaderName, HeaderValue);
 }
 
+void UVaRestRequestJSON::SetTimeout(float Seconds)
+{
+	if (Seconds > 0.f)
+	{
+		HttpRequest->SetTimeout(Seconds);
+	}
+	else
+	{
+		HttpRequest->ClearTimeout();
+	}
+}
+
+void UVaRestRequestJSON::SetBearerToken(const FString& Token)
+{
+	SetHeader(TEXT("Authorization"), FString::Printf(TEXT("Bearer %s"), *Token));
+}
+
+void UVaRestRequestJSON::SetBasicAuth(const FString& Username, const FString& Password)
+{
+	const FString Pair = FString::Printf(TEXT("%s:%s"), *Username, *Password);
+	const FTCHARToUTF8 Utf8(*Pair);
+	const FString Encoded = FBase64::Encode(reinterpret_cast<const uint8*>(Utf8.Get()), Utf8.Length());
+	SetHeader(TEXT("Authorization"), FString::Printf(TEXT("Basic %s"), *Encoded));
+}
+
+void UVaRestRequestJSON::AddMultipartTextField(const FString& FieldName, const FString& Value)
+{
+	FMultipartPart Part;
+	Part.FieldName = FieldName;
+	const FTCHARToUTF8 Utf8(*Value);
+	Part.Data.Append(reinterpret_cast<const uint8*>(Utf8.Get()), Utf8.Length());
+	MultipartParts.Add(MoveTemp(Part));
+}
+
+void UVaRestRequestJSON::AddMultipartFileField(const FString& FieldName, const FString& FileName, const TArray<uint8>& FileData, const FString& ContentType)
+{
+	FMultipartPart Part;
+	Part.FieldName = FieldName;
+	Part.FileName = FileName;
+	Part.ContentType = ContentType.IsEmpty() ? TEXT("application/octet-stream") : ContentType;
+	Part.Data = FileData;
+	MultipartParts.Add(MoveTemp(Part));
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Destruction and reset
 
@@ -94,6 +143,7 @@ void UVaRestRequestJSON::ResetRequestData(bool bClearHeaders)
 
 	RequestBytes.Empty();
 	StringRequestContent.Empty();
+	MultipartParts.Empty();
 
 	if (bClearHeaders)
 	{
@@ -138,6 +188,13 @@ void UVaRestRequestJSON::ResetResponseData()
 void UVaRestRequestJSON::Cancel()
 {
 	ContinueAction = nullptr;
+
+	if (HttpRequest->GetStatus() == EHttpRequestStatus::Processing)
+	{
+		HttpRequest->CancelRequest();
+	}
+
+	InflightRequests.RemoveAllSwap([this](const TWeakObjectPtr<UVaRestRequestJSON>& Ptr) { return !Ptr.IsValid() || Ptr.Get() == this; });
 
 	ResetResponseData();
 }
@@ -239,6 +296,23 @@ int32 UVaRestRequestJSON::GetResponseContentLength() const
 const TArray<uint8>& UVaRestRequestJSON::GetResponseContent() const
 {
 	return ResponseBytes;
+}
+
+bool UVaRestRequestJSON::SaveResponseToFile(const FString& FilePath) const
+{
+	if (FilePath.IsEmpty())
+	{
+		UE_LOG(LogVaRest, Error, TEXT("%s: SaveResponseToFile called with empty path"), *VA_FUNC_LINE);
+		return false;
+	}
+
+	if (ResponseBytes.Num() > 0)
+	{
+		return FFileHelper::SaveArrayToFile(ResponseBytes, *FilePath);
+	}
+
+	// Fall back to the cached string content (e.g. for non-JSON text responses)
+	return FFileHelper::SaveStringToFile(ResponseContent, *FilePath, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -432,6 +506,44 @@ void UVaRestRequestJSON::ProcessRequest()
 
 		break;
 	}
+	case EVaRestRequestContentType::multipart_form_data:
+	{
+		const FString Boundary = FString::Printf(TEXT("----VaRestXBoundary%s"), *FGuid::NewGuid().ToString(EGuidFormats::Digits));
+		HttpRequest->SetHeader(TEXT("Content-Type"), FString::Printf(TEXT("multipart/form-data; boundary=%s"), *Boundary));
+
+		const FString DashBoundary = FString::Printf(TEXT("--%s\r\n"), *Boundary);
+		const FString CloseBoundary = FString::Printf(TEXT("--%s--\r\n"), *Boundary);
+
+		auto AppendString = [](TArray<uint8>& Out, const FString& Str)
+		{
+			const FTCHARToUTF8 Utf8(*Str);
+			Out.Append(reinterpret_cast<const uint8*>(Utf8.Get()), Utf8.Length());
+		};
+
+		TArray<uint8> Body;
+		for (const FMultipartPart& Part : MultipartParts)
+		{
+			AppendString(Body, DashBoundary);
+			if (Part.FileName.IsEmpty())
+			{
+				AppendString(Body, FString::Printf(TEXT("Content-Disposition: form-data; name=\"%s\"\r\n\r\n"), *Part.FieldName));
+			}
+			else
+			{
+				AppendString(Body, FString::Printf(TEXT("Content-Disposition: form-data; name=\"%s\"; filename=\"%s\"\r\n"), *Part.FieldName, *Part.FileName));
+				AppendString(Body, FString::Printf(TEXT("Content-Type: %s\r\n\r\n"), *Part.ContentType));
+			}
+			Body.Append(Part.Data);
+			AppendString(Body, TEXT("\r\n"));
+		}
+		AppendString(Body, CloseBoundary);
+
+		HttpRequest->SetContent(Body);
+
+		UE_LOG(LogVaRest, Log, TEXT("Request (multipart, %d parts): %s %s"), MultipartParts.Num(), *HttpRequest->GetVerb(), *HttpRequest->GetURL());
+
+		break;
+	}
 	case EVaRestRequestContentType::json:
 	{
 		HttpRequest->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
@@ -474,9 +586,18 @@ void UVaRestRequestJSON::ProcessRequest()
 
 	// Bind event
 	HttpRequest->OnProcessRequestComplete().BindUObject(this, &UVaRestRequestJSON::OnProcessRequestComplete);
+	HttpRequest->OnRequestProgress64().BindUObject(this, &UVaRestRequestJSON::OnHttpRequestProgress);
+
+	// Track for tag-based queries / cancellation
+	InflightRequests.AddUnique(TWeakObjectPtr<UVaRestRequestJSON>(this));
 
 	// Execute the request
 	HttpRequest->ProcessRequest();
+}
+
+void UVaRestRequestJSON::OnHttpRequestProgress(FHttpRequestPtr Request, uint64 BytesSent, uint64 BytesReceived)
+{
+	OnRequestProgress.Broadcast(this, static_cast<int64>(BytesSent), static_cast<int64>(BytesReceived));
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -486,6 +607,9 @@ void UVaRestRequestJSON::OnProcessRequestComplete(FHttpRequestPtr Request, FHttp
 {
 	// Remove from root on completion
 	RemoveFromRoot();
+
+	// Drop from inflight registry
+	InflightRequests.RemoveAllSwap([this](const TWeakObjectPtr<UVaRestRequestJSON>& Ptr) { return !Ptr.IsValid() || Ptr.Get() == this; });
 
 	// Be sure that we have no data from previous response
 	ResetResponseData();
@@ -602,6 +726,37 @@ int32 UVaRestRequestJSON::RemoveTag(FName Tag)
 bool UVaRestRequestJSON::HasTag(FName Tag) const
 {
 	return (Tag != NAME_None) && Tags.Contains(Tag);
+}
+
+TArray<UVaRestRequestJSON*> UVaRestRequestJSON::GetRequestsByTag(FName Tag)
+{
+	TArray<UVaRestRequestJSON*> Result;
+	if (Tag == NAME_None)
+	{
+		return Result;
+	}
+
+	for (const TWeakObjectPtr<UVaRestRequestJSON>& WeakReq : InflightRequests)
+	{
+		if (UVaRestRequestJSON* Req = WeakReq.Get())
+		{
+			if (Req->HasTag(Tag))
+			{
+				Result.Add(Req);
+			}
+		}
+	}
+	return Result;
+}
+
+int32 UVaRestRequestJSON::CancelRequestsByTag(FName Tag)
+{
+	TArray<UVaRestRequestJSON*> Targets = GetRequestsByTag(Tag);
+	for (UVaRestRequestJSON* Req : Targets)
+	{
+		Req->Cancel();
+	}
+	return Targets.Num();
 }
 
 //////////////////////////////////////////////////////////////////////////

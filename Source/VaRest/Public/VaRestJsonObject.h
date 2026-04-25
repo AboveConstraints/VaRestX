@@ -68,6 +68,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "VaRestX|Json")
 	UVaRestJsonValue* GetField(const FString& FieldName) const;
 
+	/** Walk a dot-separated path of field names (e.g. "user.profile.name") and return the value at the end, or nullptr if any segment is missing or not an object. */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Json")
+	UVaRestJsonValue* GetFieldByPath(const FString& Path) const;
+
 	/** Add a field named FieldName with a Value */
 	UFUNCTION(BlueprintCallable, Category = "VaRestX|Json")
 	void SetField(const FString& FieldName, UVaRestJsonValue* JsonValue);

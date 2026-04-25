@@ -75,6 +75,7 @@ public:
 /** Generate a delegates for callback events */
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRequestComplete, class UVaRestRequestJSON*, Request);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnRequestFail, class UVaRestRequestJSON*, Request);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnRequestProgress, class UVaRestRequestJSON*, Request, int64, BytesSent, int64, BytesReceived);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnStaticRequestComplete, class UVaRestRequestJSON*);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnStaticRequestFail, class UVaRestRequestJSON*);
@@ -119,6 +120,26 @@ public:
 	/** Sets optional header info */
 	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
 	void SetHeader(const FString& HeaderName, const FString& HeaderValue);
+
+	/** Sets the request timeout in seconds. Pass 0 to clear the override and use the engine default. */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
+	void SetTimeout(float Seconds);
+
+	/** Convenience: sets the Authorization header to "Bearer <Token>". */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
+	void SetBearerToken(const FString& Token);
+
+	/** Convenience: sets the Authorization header to "Basic <base64(user:password)>". */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
+	void SetBasicAuth(const FString& Username, const FString& Password);
+
+	/** Add a text field for a multipart/form-data request. Only used when content type is multipart_form_data. */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
+	void AddMultipartTextField(const FString& FieldName, const FString& Value);
+
+	/** Add a file field for a multipart/form-data request. Only used when content type is multipart_form_data. */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Request")
+	void AddMultipartFileField(const FString& FieldName, const FString& FileName, const TArray<uint8>& FileData, const FString& ContentType);
 
 	//////////////////////////////////////////////////////////////////////////
 	// Destruction and reset
@@ -206,6 +227,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "VaRestX|Response")
 	const TArray<uint8>& GetResponseContent() const;
 
+	/** Save the raw response payload to disk. Returns true on success. */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Response")
+	bool SaveResponseToFile(const FString& FilePath) const;
+
 	//////////////////////////////////////////////////////////////////////////
 	// URL processing
 
@@ -237,6 +262,9 @@ private:
 	/** Internal bind function for the IHTTPRequest::OnProcessRequestCompleted() event */
 	void OnProcessRequestComplete(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
+	/** Internal bind function for IHttpRequest::OnRequestProgress64 to forward to the BP delegate. */
+	void OnHttpRequestProgress(FHttpRequestPtr Request, uint64 BytesSent, uint64 BytesReceived);
+
 public:
 	/** Event occured when the request has been completed */
 	UPROPERTY(BlueprintAssignable, Category = "VaRestX|Event")
@@ -245,6 +273,10 @@ public:
 	/** Event occured when the request wasn't successfull */
 	UPROPERTY(BlueprintAssignable, Category = "VaRestX|Event")
 	FOnRequestFail OnRequestFail;
+
+	/** Event fired periodically during the request with bytes-sent / bytes-received counters. */
+	UPROPERTY(BlueprintAssignable, Category = "VaRestX|Event")
+	FOnRequestProgress OnRequestProgress;
 
 	/** Event occured when the request has been completed */
 	FOnStaticRequestComplete OnStaticRequestComplete;
@@ -272,9 +304,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "VaRestX|Utility")
 	bool HasTag(FName Tag) const;
 
+	/** Returns every in-flight request that carries the supplied tag. */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Utility")
+	static TArray<UVaRestRequestJSON*> GetRequestsByTag(FName Tag);
+
+	/** Cancels every in-flight request that carries the supplied tag. Returns the number cancelled. */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|Utility")
+	static int32 CancelRequestsByTag(FName Tag);
+
 protected:
 	/** Array of tags that can be used for grouping and categorizing */
 	TArray<FName> Tags;
+
+	/** Static registry of in-flight requests, populated in ProcessRequest and pruned on completion/cancel. */
+	static TArray<TWeakObjectPtr<UVaRestRequestJSON>> InflightRequests;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Data
@@ -312,6 +355,16 @@ protected:
 
 	TArray<uint8> RequestBytes;
 	FString BinaryContentType;
+
+	/** Internal representation of a multipart/form-data part. */
+	struct FMultipartPart
+	{
+		FString FieldName;
+		FString FileName;       // empty for text fields
+		FString ContentType;    // empty for text fields
+		TArray<uint8> Data;     // UTF-8 bytes for text fields, raw bytes for files
+	};
+	TArray<FMultipartPart> MultipartParts;
 
 	/** Raw response storage */
 	TArray<uint8> ResponseBytes;
