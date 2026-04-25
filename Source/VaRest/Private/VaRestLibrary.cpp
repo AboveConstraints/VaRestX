@@ -82,7 +82,12 @@ FString UVaRestLibrary::StringToSha1(const FString& StringToHash)
 
 FString UVaRestLibrary::GetVaRestVersion()
 {
-	const auto PluginRef = IPluginManager::Get().FindPlugin("VaRest");
+	auto PluginRef = IPluginManager::Get().FindPlugin("VaRestX");
+	if (!PluginRef.IsValid())
+	{
+		// Fall back to the legacy plugin name so installations that still ship as "VaRest" report a version.
+		PluginRef = IPluginManager::Get().FindPlugin("VaRest");
+	}
 
 	return !PluginRef.IsValid() ? FString("invalid") : PluginRef->GetDescriptor().VersionName;
 }

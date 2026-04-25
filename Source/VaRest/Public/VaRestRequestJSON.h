@@ -292,10 +292,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRestX|Response")
 	int32 ResponseSize;
 
-	/** DEPRECATED: Please use GetResponseContentAsString() instead */
-	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRestX|Response")
-	// FString ResponseContent;
-
 	/** Is the response valid JSON? */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VaRestX|Response")
 	bool bIsValidJsonResponse;

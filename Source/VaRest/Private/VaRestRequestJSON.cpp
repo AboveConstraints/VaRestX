@@ -92,9 +92,6 @@ void UVaRestRequestJSON::ResetRequestData()
 		RequestJsonObj = NewObject<UVaRestJsonObject>();
 	}
 
-	// See issue #90
-	// HttpRequest = FHttpModule::Get().CreateRequest();
-
 	RequestBytes.Empty();
 	StringRequestContent.Empty();
 }

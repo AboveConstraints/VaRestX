@@ -8,25 +8,19 @@ public class VaRestEditor : ModuleRules
 	{
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
         DefaultBuildSettings = BuildSettingsVersion.V5;
-		
+
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				"VaRestEditor/Private",
-				
-				// ... add other private include paths required here ...
 			});
-			
-		
+
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
 				"Core",
                 "VaRest"
-
-				// ... add other public dependencies that you statically link with here ...
 			});
-			
-		
+
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
@@ -43,18 +37,16 @@ public class VaRestEditor : ModuleRules
                 "GraphEditor",
                 "Kismet",       // for FWorkflowCentricApplication
                 "PropertyEditor",
-                "EditorStyle",
                 "Sequencer",
                 "DetailCustomizations",
                 "Settings",
-                "RenderCore"
+                "RenderCore",
+                "EditorFramework"
 			});
-		
-		
+
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
-				// ... add any modules that your module loads dynamically here ...
 			});
 	}
 }
