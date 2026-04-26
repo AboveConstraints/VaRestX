@@ -1,8 +1,8 @@
 {
 	"FileVersion": 3,
 	"FriendlyName": "VaRestX",
-	"Version": 33,
-	"VersionName": "1.1-r38",
+	"Version": 34,
+	"VersionName": "1.2-r1",
 	"CreatedBy": "Vladimir Alyamkin, Mauro Leoci",
 	"CreatedByURL": "https://ufna.dev",
 	"EngineVersion": "5.7.0",
