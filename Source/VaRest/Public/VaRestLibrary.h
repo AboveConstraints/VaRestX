@@ -9,6 +9,7 @@
 #include "VaRestLibrary.generated.h"
 
 class UVaRestSettings;
+class UVaRestJsonObject;
 
 /**
  * Useful tools for REST communications
@@ -106,4 +107,67 @@ public:
 	 */
 	UFUNCTION(BlueprintPure, Category = "VaRestX|Utility", meta = (WorldContext = "WorldContextObject"))
 	static FVaRestURL GetWorldURL(UObject* WorldContextObject);
+
+	//////////////////////////////////////////////////////////////////////////
+	// OAuth / JWT primitives (RFC 4648 §5, 6749, 7519, 7636)
+	//
+	// These are stateless helpers — no token storage, no refresh loops, no
+	// signature verification. Callers own the token lifecycle.
+
+public:
+	/** Base64URL encode the UTF-8 bytes of Source (no padding). */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Utility", meta = (DisplayName = "Base64Url Encode"))
+	static FString Base64UrlEncode(const FString& Source);
+
+	/** Base64URL decode to a UTF-8 string. Returns true on success. */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Utility", meta = (DisplayName = "Base64Url Decode"))
+	static bool Base64UrlDecode(const FString& Source, FString& Dest);
+
+	/** Base64URL encode raw bytes (no padding). */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Utility", meta = (DisplayName = "Base64Url Encode Data"))
+	static FString Base64UrlEncodeData(const TArray<uint8>& Data);
+
+	/** Base64URL decode to raw bytes. Returns true on success. */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Utility", meta = (DisplayName = "Base64Url Decode Data"))
+	static bool Base64UrlDecodeData(const FString& Source, TArray<uint8>& Dest);
+
+	/** SHA-256 over the UTF-8 bytes of StringToHash. Returns 64 lower-case hex digits. */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Utility", meta = (DisplayName = "String to SHA256"))
+	static FString StringToSha256(const FString& StringToHash);
+
+	/** SHA-256 over a byte array. Returns 64 lower-case hex digits. */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|Utility", meta = (DisplayName = "Bytes to SHA256"))
+	static FString BytesToSha256(const TArray<uint8>& Data);
+
+	/** Split a JWT into its three parts. HeaderJson and PayloadJson are Base64URL-decoded UTF-8; SignatureBase64Url is the raw third segment. Returns false on malformed token. */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|OAuth", meta = (DisplayName = "Get JWT Segments"))
+	static bool GetJwtSegments(const FString& Token, FString& HeaderJson, FString& PayloadJson, FString& SignatureBase64Url);
+
+	/** Decode and parse the JWT header into a JSON object (nullptr on failure). Does NOT verify the signature. */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|OAuth", meta = (DisplayName = "Decode JWT Header"))
+	static UVaRestJsonObject* DecodeJwtHeader(const FString& Token);
+
+	/** Decode and parse the JWT payload into a JSON object (nullptr on failure). Does NOT verify the signature. */
+	UFUNCTION(BlueprintCallable, Category = "VaRestX|OAuth", meta = (DisplayName = "Decode JWT Payload"))
+	static UVaRestJsonObject* DecodeJwtPayload(const FString& Token);
+
+	/** True if the JWT 'exp' claim is in the past by more than LeewaySeconds. False if the claim is missing or token is malformed. */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|OAuth", meta = (DisplayName = "Is JWT Expired"))
+	static bool IsJwtExpired(const FString& Token, int32 LeewaySeconds = 0);
+
+	/** Generate a PKCE code verifier per RFC 7636 (43–128 unreserved chars). Length is clamped to that range. */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|OAuth", meta = (DisplayName = "Generate PKCE Verifier"))
+	static FString GeneratePkceVerifier(int32 Length = 64);
+
+	/** Compute the S256 PKCE challenge: Base64URL(SHA256(verifier)). */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|OAuth", meta = (DisplayName = "PKCE Challenge S256"))
+	static FString PkceChallengeS256(const FString& Verifier);
+
+	/** Build an OAuth authorization URL by appending percent-encoded query parameters to Endpoint. */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|OAuth", meta = (DisplayName = "Build Authorization URL"))
+	static FString BuildAuthorizationUrl(const FString& Endpoint, const TMap<FString, FString>& Params);
+
+	/** Parse an application/x-www-form-urlencoded string (e.g. token endpoint response or redirect query) into a map. A leading '?' is tolerated. */
+	UFUNCTION(BlueprintPure, Category = "VaRestX|OAuth", meta = (DisplayName = "Parse Form URL Encoded"))
+	static TMap<FString, FString> ParseFormUrlEncoded(const FString& Body);
 };

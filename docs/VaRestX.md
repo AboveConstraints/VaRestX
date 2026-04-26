@@ -248,6 +248,25 @@ One-shot helper, JSON construction, file loading.
 
 > **Hashing note.** Both MD5 and SHA‑1 are cryptographically broken. Use them for non-security purposes (cache keys, deduplication, content hashes). For HMAC-style authentication, use SHA‑256 or stronger.
 
+### OAuth / JWT primitives
+
+Stateless helpers for OAuth 2.0 (RFC 6749), JWT inspection (RFC 7519), and PKCE (RFC 7636). VaRestX deliberately does not handle token storage, refresh loops, or signature verification — those are app-level concerns and lock you into a specific flow / key-management strategy.
+
+| Function | Notes |
+|---|---|
+| `Base64UrlEncode` / `Base64UrlDecode` | UTF‑8 round-trip with the URL-safe alphabet (RFC 4648 §5), no padding |
+| `Base64UrlEncodeData` / `Base64UrlDecodeData` | Binary variants |
+| `StringToSha256(FString)` / `BytesToSha256(TArray<uint8>)` | SHA‑256 over UTF‑8 / raw bytes; returns 64 hex digits |
+| `GetJwtSegments(Token, Header&, Payload&, Sig&)` | Splits a JWT and Base64URL-decodes the first two segments to UTF‑8 strings. No signature verification. |
+| `DecodeJwtHeader(Token)` / `DecodeJwtPayload(Token)` | Returns a `UVaRestJsonObject*` (nullptr on malformed input). No signature verification. |
+| `IsJwtExpired(Token, LeewaySeconds = 0)` | True if `exp` is in the past beyond the leeway. False if `exp` is missing or token is malformed. |
+| `GeneratePkceVerifier(Length = 64)` | Random verifier in `[A-Z][a-z][0-9]-_`. Length is clamped to 43–128. |
+| `PkceChallengeS256(Verifier)` | `Base64URL(SHA256(verifier))` |
+| `BuildAuthorizationUrl(Endpoint, Params)` | Appends percent-encoded `Params` as a query string. Tolerates an `Endpoint` that already has a `?`. |
+| `ParseFormUrlEncoded(Body)` | Parses an `application/x-www-form-urlencoded` string (token endpoint response, redirect query) into a map. Leading `?` is stripped. |
+
+> **Verification.** `DecodeJwt*` does not check the signature. Treat decoded claims as untrusted unless your transport guarantees authenticity (e.g. you fetched the token from your own server over TLS). For RS256/ES256 verification with JWKS rotation, integrate a dedicated library.
+
 ---
 
 ## Backward compatibility
