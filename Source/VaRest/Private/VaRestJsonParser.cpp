@@ -1066,10 +1066,10 @@ void FJSONWriter::Write(TSharedPtr<FJsonValue> JsonValue, FArchive* Writer, bool
 			Str = FString(TEXT("\""));
 			UVaRestJsonObject::WriteStringToArchive(Ar, *Str, Str.Len());
 
-			const TCHAR* BufferPtr = *ChildJsonPair.Key;
-			for (int i = 0; i < ChildJsonPair.Key.Len(); ++i)
+			FString KeyName = FString(*ChildJsonPair.Key);
+			for (int i = 0; i < KeyName.Len(); ++i)
 			{
-				Str = FString(1, &ChildJsonPair.Key[i]);
+				Str = FString(1, &KeyName[i]);
 				UVaRestJsonObject::WriteStringToArchive(Ar, *Str, Str.Len());
 			}
 

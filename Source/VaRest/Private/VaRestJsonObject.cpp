@@ -133,7 +133,12 @@ FString UVaRestJsonObject::GetFieldTypeString(const FString& FieldName) const
 TArray<FString> UVaRestJsonObject::GetFieldNames() const
 {
 	TArray<FString> Result;
-	JsonObj->Values.GetKeys(Result);
+
+	// Values map now uses shared string type for keys; iterate and convert to FString
+	for (const auto& Pair : JsonObj->Values)
+	{
+		Result.Add(FString(*Pair.Key));
+	}
 
 	return Result;
 }

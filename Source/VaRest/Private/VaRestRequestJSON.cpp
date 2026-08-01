@@ -436,7 +436,7 @@ void UVaRestRequestJSON::ProcessRequest()
 		// Loop through all the values and prepare additional url part
 		for (auto RequestIt = RequestJsonObj->GetRootObject()->Values.CreateIterator(); RequestIt; ++RequestIt)
 		{
-			FString Key = RequestIt.Key();
+			FString Key = FString(*RequestIt.Key());
 			FString Value = RequestIt.Value().Get()->AsString();
 
 			if (!Key.IsEmpty() && !Value.IsEmpty())
@@ -486,7 +486,7 @@ void UVaRestRequestJSON::ProcessRequest()
 			// Loop through all the values and prepare additional url part
 			for (auto RequestIt = RequestJsonObj->GetRootObject()->Values.CreateIterator(); RequestIt; ++RequestIt)
 			{
-				FString Key = RequestIt.Key();
+				FString Key = FString(*RequestIt.Key());
 				FString Value = RequestIt.Value().Get()->AsString();
 
 				if (!Key.IsEmpty() && !Value.IsEmpty())
